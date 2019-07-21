@@ -22,11 +22,17 @@ app.use(function(req,res,next){
     next();
 })
 
+app.get('/', function (req,res) {
+    res.send('Hello');
+ });
 
 mongoose.Promise = global.Promise;
 
 // Connect to MongoDB
-mongoose.connect(`${process.env.MONGO_URL_LOCAL}`, {
+
+var env = process.env.NODE_ENV === 'development' ? process.env.MONGO_URL_LOCAL : process.env.MONGO_URL_PROD;
+
+mongoose.connect(env, {
     useNewUrlParser: true
 }).then(() => {
     console.log("Connected to MongoDB.")  
@@ -36,6 +42,6 @@ mongoose.connect(`${process.env.MONGO_URL_LOCAL}`, {
 })
 
 app.listen(process.env.PORT || 5480, () => {
-  console.log("TMS-API is now online.")  
+  console.log(`TMS-API is now online. Ready for ${process.env.NODE_ENV}.`)  
 })
 

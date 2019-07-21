@@ -24,7 +24,7 @@ exports.register = (req, res) => {
     
     accountObject.save()
                  .then(result => {
-                     res.status(201).send(result)
+                     res.status(201).send({message: `Account has been saved.`, Account: result})
                  })
                  .catch(error => {
                     res.status(500).send({
