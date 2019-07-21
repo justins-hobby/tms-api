@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const mongoose = require('mongoose')
 require('dotenv').config()
-const Account = require('./src/models/account.model')
+
 const app = express()
 
 app.use(cors());
@@ -29,7 +29,7 @@ mongoose.Promise = global.Promise;
 mongoose.connect(`${process.env.MONGO_URL_LOCAL}`, {
     useNewUrlParser: true
 }).then(() => {
-
+    console.log("Connected to MongoDB.")  
 }).catch(err => {
     console.log(`Cannot connect: ${err}`);
     process.exit();
