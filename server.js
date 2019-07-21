@@ -36,6 +36,6 @@ mongoose.connect(`${process.env.MONGO_URL_LOCAL}`, {
 })
 
 app.listen(`${process.env.APP_PORT}` || 5480, () => {
-    
+  console.log("TMS-API is now online.")  
 })
 
