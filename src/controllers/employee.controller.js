@@ -10,10 +10,12 @@ exports.create = (req, res) => {
         })
     }
 
+    console.log(req.body);
+
     const employeeObject = new Employee({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        terminalNumber: req.body.terminalNumber
+        department: req.body.department
     })
 
     employeeObject.save()
@@ -72,14 +74,16 @@ exports.update = (req, res) => {
         })        
     }
 
-    Employee.findByIdAndUpdate(req.params.employeeID, {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        terminalNumber: req.body.terminalNumber
-    },
-    {
-        new: true
-    }
+    Employee.findByIdAndUpdate(
+        req.params.employeeID,
+        {
+            "$set": {
+                firstName: req.body.firstName,
+                lastName : req.body.lastName,                       
+                department: req.body.department,
+            }
+        },
+        { new: true }
     )
     .then(employee => {
         if(!employee){
