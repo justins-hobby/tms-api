@@ -13,6 +13,7 @@ app.use(bodyParser.json())
 // Routes
 require('./src/routes/employee.routes')(app);
 require('./src/routes/account.routes')(app);
+require('./src/routes/department.routes')(app);
 
 // CORS
 app.use(function(req,res,next){
