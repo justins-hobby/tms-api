@@ -14,6 +14,7 @@ app.use(bodyParser.json())
 require('./src/routes/employee.routes')(app);
 require('./src/routes/account.routes')(app);
 require('./src/routes/department.routes')(app);
+require('./src/routes/terminal.routes')(app);
 
 // CORS
 app.use(function(req,res,next){
