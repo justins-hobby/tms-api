@@ -6,6 +6,6 @@ module.exports = (app) => {
     app.get('/terminals', helper.validateToken, terminals.findAll)
     app.get('/terminal/:terminalID', helper.validateToken, terminals.findOne)
     app.put('/terminal/:terminalID', helper.validateToken, terminals.update)
-    app.post('/terminals/validate/:terminalID', helper.validateToken, terminals.validateTerminalAssignment)
+    app.post('/terminal/validate/:terminalID', helper.validateToken, terminals.validateTerminalAssignment)
 
 }
