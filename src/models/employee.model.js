@@ -4,7 +4,7 @@ const EmployeeSchema = mongoose.Schema(
     {        
         firstName: String,
         lastName: String,
-        department: Object    
+        departmentID: mongoose.Schema.Types.ObjectId 
     },
     {
         timestamps: true

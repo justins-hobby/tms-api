@@ -63,7 +63,7 @@ exports.findOne = (req, res) => {
                     message: `Terminal not found on database.`
                 })
 
-            res.send(JSON.stringify(terminal))
+            res.send(terminal)
         })
         .catch(error => {
             return res.status(500).send({
