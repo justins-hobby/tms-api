@@ -113,43 +113,6 @@ exports.update = (req, res) => {
             message: `An error occurred while updating that Terminal information: ${err.message}`
         })
     })
-
-
-    /*
-    Terminal.findByIdAndUpdate(
-        req.params.TerminalID,
-        {
-            "$set": {
-                terminalNumber: req.body.terminalNumber,        
-                employeeID: req.body.employeeID,
-                assignedDate: req.body.assignedDate,
-                returnedDate: req.body.returnedDate,
-                updatedAt: req.body.dateModified
-            }
-        },
-        { new: true }
-    )
-    .then(Terminal => {
-        if(!Terminal){
-            return res.status(404).send({
-                message: `Terminal with that details were not found on database.`
-            })
-        }
-
-        res.send(Terminal)
-    })
-    .catch(err => {
-        if(err.kind === 'ObjectId'){
-            return res.status(404).send({
-                message: `Terminal with that details were not found on database.`
-            })
-        }
-
-        return res.status(500).send({
-            message: `An error occurred while updating that Terminal information: ${err.message}`
-        })
-    })
-    */
 };
 
 exports.validateTerminalAssignment = (req, res) => {
