@@ -1,30 +1,6 @@
 const Employee = require('../models/employee.model.js')
+const Terminals = require('../models/terminal.model')
 const mongoose = require('mongoose')
-
-exports.create = (req, res) => {
-
-    if (!req.body) {
-        return res.status(400).send({
-            message: "Cannot save with a blank employee details."
-        })
-    }
-
-    const employeeObject = new Employee({
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        departmentID: req.body.departmentID
-    })
-
-    employeeObject.save()
-        .then(data => {
-            res.send(data)
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: `An error occurred while saving data: ${err.message}`
-            })
-        })
-};
 
 exports.findAll = (req, res) => {
     Employee.aggregate([
@@ -69,6 +45,162 @@ exports.findOne = (req, res) => {
         })
 };
 
+exports.findBarcode = (req, res) => {
+
+    Employee.findOne({
+        barcodeNumber: req.params.barcodeNumber
+    }).exec(function (err, employee) {
+        if (err)
+            return res.status(404).send({
+                message: `${req.params.barcodeNumber} not found on database.`
+            })
+
+        if (employee != null) {
+            Terminals.findOne({
+                employeeID: employee._id
+            }).exec(function (error, terminal) {
+                if (error)
+                    return res.status(404).send({
+                        message: `${req.params.barcodeNumber} not found on database.`
+                    })
+
+                res.status(200).send({
+                    employee,
+                    terminal
+                })
+            })
+        } else {
+            return res.status(404).send({
+                message: `${req.params.barcodeNumber} not found on database.`
+            })
+        }
+    });
+
+
+
+
+    /*
+    Employee.findOne({
+        'barcodeNumber': req.params.barcodeNumber
+    })
+        .then(barcode => {
+            if (!barcode)
+                return res.status(404).send({
+                    message: `Barcode Number not found on database.`
+                })
+
+            res.send(barcode)
+        })
+        .catch(error => {
+            return res.status(500).send({
+                message: `Something is wrong: ${err.message}`
+            })
+        })    
+       
+    */
+
+
+    /*
+            Employee.aggregate(
+                [
+                    {
+                        "$project" : {
+                            "employeeName" : {
+                                "$concat" : [ "$firstName", " ", "$lastName"]
+                            },
+                            "barcodeNumber" : "$barcodeNumber"
+                        }
+                    },
+                    { 
+                        "$lookup" : {
+                            "from" : "terminals",
+                            "localField" : "_id",
+                            "foreignField" : "employeeID",
+                            "as" : "employee_terminal"
+                        }
+                    },
+                    {
+                        "$project": {
+                            "fullName" : 1, 
+                            "barcodeNumber" : 1,
+                            "employee_terminal" : { 
+                                "$arrayElemAt" : [ "$employee_terminal", 0  ]
+                            }
+                        }
+                    }
+                   
+                ]
+            )
+            .then(r => {
+                console.log(r)
+                res.send(r)
+            })
+            .catch(error=>{
+                return res.status(500).send({
+                    message: `Something is wrong: ${error.message}`
+                })           
+            })
+    
+    */
+
+
+}
+
+
+exports.validateBarcodeAssignment = (req, res) => {
+
+    if (req.params.employeeID !== 'new') {
+
+        let employeeID = mongoose.Types.ObjectId(req.params.employeeID);
+
+        Employee.find({
+            'barcodeNumber': req.body.barcodeNumber,
+            '_id': { $ne: employeeID }
+        }).then(r => {
+            if (r.length > 0)
+                return res.status(400).send({ message: `${req.body.barcodeNumber} is already assigned to another employee.` })
+
+            return res.status(200).send({ message: `OK` })
+        })
+    } else {
+        Employee.findOne({
+            'barcodeNumber': req.body.barcodeNumber
+        }).then(r => {
+            if (r != null)
+                return res.status(400).send({ message: `${req.body.barcodeNumber} is already assigned to another employee.` })
+
+            return res.status(200).send({ message: `OK` })
+        })
+    }
+
+}
+
+exports.create = (req, res) => {
+
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Cannot save with a blank employee details."
+        })
+    }
+
+    const employeeObject = new Employee({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        departmentID: req.body.departmentID,
+        barcodeNumber: req.body.barcodeNumber
+    })
+
+    employeeObject.save()
+        .then(data => {
+            res.send(data)
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: `An error occurred while saving data: ${err.message}`
+            })
+        })
+};
+
 exports.update = (req, res) => {
     if (!req.body) {
         return res.status(400).send({
@@ -83,6 +215,7 @@ exports.update = (req, res) => {
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
                 departmentID: req.body.departmentID,
+                barcodeNumber: req.body.barcodeNumber
             }
         },
         { new: true }
@@ -110,30 +243,3 @@ exports.update = (req, res) => {
 
 };
 
-exports.validateTerminalAssignment = (req, res) => {
-
-    if (req.params.employeeID !== 'new') {
-
-        let oid = mongoose.Types.ObjectId(req.params.employeeID);
-
-        Employee.find({
-            'terminalNumber': req.body.terminalNumber,
-            '_id': { $ne: oid }
-        }).then(r => {
-            if (r.length > 0)
-                return res.status(400).send({ message: `That terminal number is already assigned.` })
-
-            return res.status(200).send({ message: `OK` })
-        })
-    } else {
-        Employee.findOne({
-            'terminalNumber': req.body.terminalNumber
-        }).then(r => {
-            if (r != null)
-                return res.status(400).send({ message: `${req.body.terminalNumber} is already assigned.` })
-
-            return res.status(200).send({ message: `OK` })
-        })
-    }
-
-}
