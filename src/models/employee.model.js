@@ -4,7 +4,8 @@ const EmployeeSchema = mongoose.Schema(
     {        
         firstName: String,
         lastName: String,
-        terminalNumber: String    
+        departmentID: mongoose.Schema.Types.ObjectId,
+        barcodeNumber: String
     },
     {
         timestamps: true

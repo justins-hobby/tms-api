@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const mongoose = require('mongoose')
 require('dotenv').config()
-const Account = require('./src/models/account.model')
+
 const app = express()
 
 app.use(cors());
@@ -13,6 +13,8 @@ app.use(bodyParser.json())
 // Routes
 require('./src/routes/employee.routes')(app);
 require('./src/routes/account.routes')(app);
+require('./src/routes/department.routes')(app);
+require('./src/routes/terminal.routes')(app);
 
 // CORS
 app.use(function(req,res,next){
@@ -22,20 +24,26 @@ app.use(function(req,res,next){
     next();
 })
 
+app.get('/', function (req,res) {
+    res.send('Hello');
+ });
 
 mongoose.Promise = global.Promise;
 
 // Connect to MongoDB
-mongoose.connect(`${process.env.MONGO_URL_LOCAL}`, {
+
+var env = process.env.NODE_ENV === 'development' ? process.env.MONGO_URL_LOCAL : process.env.MONGO_URL_PROD;
+
+mongoose.connect(env, {
     useNewUrlParser: true
 }).then(() => {
-
+    console.log("Connected to MongoDB.")  
 }).catch(err => {
     console.log(`Cannot connect: ${err}`);
     process.exit();
 })
 
-app.listen(`${process.env.APP_PORT}` || 5480, () => {
-    
+app.listen(process.env.PORT || 5480, () => {
+  console.log(`TMS-API is now online. Ready for ${process.env.NODE_ENV}.`)  
 })
 
